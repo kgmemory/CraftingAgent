@@ -58,6 +58,7 @@ export class Task {
     }
     const task = await this.storage.createOrUpdateTask({
       id: this.taskID,
+      name: this.userInstruction,
       projectId: this.projectId,
       updatedAt: new Date()
     })
@@ -72,7 +73,7 @@ export class Task {
         })
     }
 
-    if (this.modelConfig.agentModel?.provider) {
+    if (this.modelConfig?.agentModel?.provider) {
       const modelConfig = await this.storage.getConfigByKey(this.modelConfig.agentModel.provider, 'llm')
       if (modelConfig) {
         this.modelConfig.agentModel = JSON.parse(modelConfig.val || '{}')
