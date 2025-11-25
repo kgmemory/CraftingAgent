@@ -1,0 +1,7 @@
+packages:
+  - 'md-ai'
+  - 'md-ai/apps/*'
+  - 'md-ai/packages/*'
+  - 'renpyAgent'
+  - 'packages/*'
+
