@@ -139,27 +139,48 @@ export class Task {
 
       const stream = handler.chatCompletion(systemPrompt, this.historyMessages, getTools())
 
-      const assistantContentBlocks: ContentBlockParam[] = []
+      let accumulatedText = ''
+      let accumulatedThinking = ''
+      const toolCalls: ApiStreamToolCall[] = []
       for await (const chunk of stream) {
         switch (chunk.type) {
           case 'text':
-            assistantContentBlocks.push({
-              type: 'text',
-              text: chunk.text,
-            })
+            accumulatedText += chunk.text
+            yield chunk
+            break
+          case 'reasoning':
+            accumulatedThinking += chunk.reasoning
             yield chunk
             break
           case 'tool_calls':
-            assistantContentBlocks.push({
-              type: 'tool_use',
-              id: chunk.tool_call.function.id || '',
-              input: chunk.tool_call.function.arguments,
-              name: chunk.tool_call.function.name || '',
-            })
+            toolCalls.push(chunk.tool_call)
             lastToolCall = chunk.tool_call
             yield chunk
             break
         }
+      }
+
+      const assistantContentBlocks: ContentBlockParam[] = []
+      if (accumulatedText) {
+        assistantContentBlocks.push({
+          type: 'text',
+          text: accumulatedText,
+        })
+      }
+      if (accumulatedThinking) {
+        assistantContentBlocks.push({
+          type: 'thinking',
+          thinking: accumulatedThinking,
+          signature: '',
+        })
+      }
+      for (const toolCall of toolCalls) {
+        assistantContentBlocks.push({
+          type: 'tool_use',
+          id: toolCall.function.id || '',
+          input: toolCall.function.arguments,
+          name: toolCall.function.name || '',
+        })
       }
       await this.saveMessage('assistant', assistantContentBlocks)
 
