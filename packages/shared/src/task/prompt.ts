@@ -1,27 +1,15 @@
-export enum SystemPromptSection {
-  AGENT_ROLE = 'AGENT_ROLE_SECTION',
-  TOOL_USE = 'TOOL_USE_SECTION',
-  EDITING_FILES = 'EDITING_FILES_SECTION',
-  TODO = 'TODO_SECTION',
-  CAPABILITIES = 'CAPABILITIES_SECTION',
-  RULES = 'RULES_SECTION',
-  OBJECTIVE = 'OBJECTIVE_SECTION',
-  USER_INSTRUCTIONS = 'USER_INSTRUCTIONS_SECTION',
-  FEEDBACK = 'FEEDBACK_SECTION',
-  TASK_PROGRESS = 'TASK_PROGRESS_SECTION',
-}
-
 export default function buildSystemPrompt(userInstruction: string): string {
   return `${AGENT_ROLE}
 ${TOOL_USE_GUIDELINE_SECTION}
 ${TODO_LIST_SECTIONS}
+${CAPABILITIES}
 ${USER_INSTRUCTIONS(userInstruction)}
 `
 }
 
 function AGENT_ROLE(): string {
   return `
-You are Cline,
+你是百灵鸟,
 一个拥有专业写作、审美、CSS能力的高级写作人员。
 你非常擅长微信公众号写作，对文章内容、排版布局、markdown、CSS都非常熟悉，善于产出高质量公众号内容。
   `
@@ -60,6 +48,15 @@ function  TODO_LIST_SECTIONS(): string {
 系统将在适当时机自动在提示中包含待办列表的上下文信息
 重点创建可执行、有意义的步骤，而非细枝末节的技术细节
 `
+}
+
+function CAPABILITIES(): string {
+  return `能力说明
+可用工具集：您可以使用工具执行计划设定、网络搜索、写入内容以及提出后续问题。这些工具能帮助您高效完成多种任务。
+初始内容概览：用户文章内容会在首次执行任务时包含在环境详情里，您可以看到整篇文章的目录、文章的正文内容等信息。
+网络搜索：您可以选择在用户提出修改需求时执行网络搜索，以获取更丰富、更具有时效性的信息，以便于制定出更好的文章结构或者是丰富内容。
+典型的工作流示例：在接到任何需求时，请先审阅当前文章内容，结合需求 -> 决定是否有必要执行网络搜索 -> 根据需求和网络搜索结果，制定出文章结构 -> 生成文章内容 -> 将内容写入到用户的文章中。
+  `
 }
 
 function USER_INSTRUCTIONS(userInstruction: string): string {

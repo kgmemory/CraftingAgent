@@ -5,6 +5,8 @@ import { ApiStreamToolCall } from '../providers/stream'
 import ReplaceToolHandler, { ReplaceTool } from './replace_in_file'
 import WriteFileToolHandler, { WriteFileTool } from './write_to_file'
 import { TaskContext } from '@/task'
+import {TodoTool, TodoToolHandler} from "./todo";
+import {WebSearchTool, WebSearchToolHandler} from "./web_search";
 
 export type AbstractTool = OpenAITool | AnthropicTool | GoogleTool
 
@@ -51,13 +53,17 @@ export function getToolHandler(toolName: string): ToolHandler | undefined {
       return new ReplaceToolHandler()
     case 'write_to_file':
       return new WriteFileToolHandler()
+    case 'todo':
+      return new TodoToolHandler()
+    case 'web_search':
+        return new WebSearchToolHandler()
     default:
-      return undefined
+      throw new Error(`Unsupported tool: ${toolName}`)
   }
 }
 
 export function getTools(): AbstractTool[] {
-  return [ReplaceTool, WriteFileTool]
+  return [ReplaceTool, WriteFileTool, TodoTool, WebSearchTool]
 }
 
 /**

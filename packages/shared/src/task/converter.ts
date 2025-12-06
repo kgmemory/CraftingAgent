@@ -14,6 +14,11 @@ export function convertContentBlock(
         contentBlock.tool_use_id = block.id
         contentBlock.name = block.name
         contentBlock.input = block.input as Record<string, any>
+      } else if (block.type === 'thinking') {
+          contentBlock.content = block.thinking
+      } else if (block.type === 'tool_result') {
+          contentBlock.content = block.content
+          contentBlock.tool_use_id = block.tool_use_id
       }
       return contentBlock
     })
@@ -41,6 +46,12 @@ export function convertToAnthropicContentBlocks(
           tool_use_id: block.tool_use_id,
           content: typeof block.content === 'string' ? block.content : '',
         }
+      } else if (block.type === 'thinking') {
+          return {
+              type: 'thinking',
+              thinking: typeof block.content === 'string' ? block.content : '',
+              signature: '',
+          }
       } else {
         return {
           type: 'text',

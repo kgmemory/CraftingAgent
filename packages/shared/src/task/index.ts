@@ -12,6 +12,7 @@ import { DoubaoHandler } from '../modules/providers/doubao'
 import { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages'
 import { convertToAnthropicContentBlocks, convertContentBlock } from './converter'
 import { GoogleHandler } from '../modules/providers/google'
+import { logger } from '../logger'
 
 export type {
   TaskContext,
@@ -110,7 +111,7 @@ export class Task {
       userMessageBlocks.push({
         type: 'tool_result',
         content: lastToolCallResult,
-        tool_use_id: lastToolCall.call_id || '',
+        tool_use_id: lastToolCall.function.id || '',
       })
     }
     if (this.userInstruction) {
@@ -134,14 +135,10 @@ export class Task {
     while (taskInLoop) {
       // build user message
       await this.buildUserTaskMessage(lastToolCall, lastToolCallResult)
-      lastToolCall = undefined
-      lastToolCallResult = undefined
-
       const stream = handler.chatCompletion(systemPrompt, this.historyMessages, getTools())
 
       let accumulatedText = ''
       let accumulatedThinking = ''
-      const toolCalls: ApiStreamToolCall[] = []
       for await (const chunk of stream) {
         switch (chunk.type) {
           case 'text':
@@ -153,49 +150,60 @@ export class Task {
             yield chunk
             break
           case 'tool_calls':
-            toolCalls.push(chunk.tool_call)
-            lastToolCall = chunk.tool_call
+            if (lastToolCall) {
+              lastToolCall.function.arguments += chunk.tool_call.function.arguments
+            } else {
+              lastToolCall = chunk.tool_call
+            }
             yield chunk
             break
         }
       }
 
       const assistantContentBlocks: ContentBlockParam[] = []
+        if (accumulatedThinking) {
+            assistantContentBlocks.push({
+                type: 'thinking',
+                thinking: accumulatedThinking,
+                signature: '',
+            })
+        }
       if (accumulatedText) {
         assistantContentBlocks.push({
           type: 'text',
           text: accumulatedText,
         })
       }
-      if (accumulatedThinking) {
-        assistantContentBlocks.push({
-          type: 'thinking',
-          thinking: accumulatedThinking,
-          signature: '',
-        })
-      }
-      for (const toolCall of toolCalls) {
-        assistantContentBlocks.push({
-          type: 'tool_use',
-          id: toolCall.function.id || '',
-          input: toolCall.function.arguments,
-          name: toolCall.function.name || '',
-        })
+
+
+      if (lastToolCall) {
+          let input = lastToolCall.function.arguments
+          if (typeof input === 'string') {
+              try {
+                  input = JSON.parse(input)
+              } catch (e) {
+              }
+          }
+          
+          assistantContentBlocks.push({
+              type: 'tool_use',
+              id: lastToolCall.function.id || '',
+              input: input,
+              name: lastToolCall.function.name || '',
+          })
       }
       await this.saveMessage('assistant', assistantContentBlocks)
-
       if (lastToolCall && lastToolCall.function.name) {
         const toolHandler = getToolHandler(lastToolCall.function.name)
         if (toolHandler) {
           lastToolCallResult = await toolHandler.execute(lastToolCall, this.taskContext)
-          const toolResultBlock: Anthropic.ContentBlockParam[] = [
-            {
-              content: lastToolCallResult,
-              tool_use_id: lastToolCall.function.id || '',
-              type: 'tool_result',
-            },
-          ]
-          await this.saveMessage('user', toolResultBlock)
+          logger.info({
+            taskId: this.taskID,
+            projectId: this.projectId,
+            toolName: lastToolCall.function.name,
+            toolCallId: lastToolCall.function.id,
+            result: lastToolCallResult,
+          }, 'Tool execution result')
         }
       } else {
         break
@@ -207,8 +215,6 @@ export class Task {
     role: 'user' | 'assistant',
     blocks: Anthropic.ContentBlockParam[],
   ) {
-    const contentBlocks: ContentBlock[] =
-      convertContentBlock(blocks)
     this.historyMessages.push({ role: role, content: blocks })
 
     await this.storage.createChatMessage({
@@ -217,7 +223,7 @@ export class Task {
       conversationRound: this.conversationRound,
       messageOrder: 1,
       role: role,
-      content: contentBlocks,
+      content: convertContentBlock(blocks),
     })
   }
 

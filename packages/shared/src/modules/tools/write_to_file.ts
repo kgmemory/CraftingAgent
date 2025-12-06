@@ -13,10 +13,10 @@ export const WriteFileTool: OpenAITool = {
     parameters: {
       type: 'object',
       properties: {
-        path: {
-          type: 'string',
-          description: 'The path to the file to write to',
-        },
+        // path: {
+        //   type: 'string',
+        //   description: 'The path to the file to write to',
+        // },
         content: {
           type: 'string',
           description:
