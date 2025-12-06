@@ -1,5 +1,5 @@
 import { ApiHandler } from './index'
-import { ProviderConfig } from '../../task/types'
+import { ProviderConfig } from '../task/types'
 import Anthropic from '@anthropic-ai/sdk'
 import { ApiStream } from './stream'
 import { AbstractTool, convertToAnthropicTool } from '../tools/index'

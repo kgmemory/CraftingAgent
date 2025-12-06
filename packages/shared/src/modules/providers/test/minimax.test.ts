@@ -1,5 +1,5 @@
 import { MinimaxHandler } from '../minimax'
-import { ProviderConfig } from '../../../task/types'
+import { ProviderConfig } from '../../task/types'
 import Anthropic from '@anthropic-ai/sdk'
 import { Tool } from '@anthropic-ai/sdk/src/resources/messages/messages'
 

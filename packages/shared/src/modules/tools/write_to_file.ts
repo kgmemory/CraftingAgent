@@ -2,7 +2,7 @@ import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completi
 import { ToolHandler } from './index'
 import { ApiStreamToolCall } from '../providers/stream'
 import { writeFileCore } from '../tool_handlers/file_writer'
-import { TaskContext } from '../../task/types'
+import { TaskContext } from '../task/types'
 
 export const WriteFileTool: OpenAITool = {
   type: 'function',
@@ -13,10 +13,10 @@ export const WriteFileTool: OpenAITool = {
     parameters: {
       type: 'object',
       properties: {
-        // path: {
-        //   type: 'string',
-        //   description: 'The path to the file to write to',
-        // },
+        path: {
+          type: 'string',
+          description: 'The path to the file to write to',
+        },
         content: {
           type: 'string',
           description:

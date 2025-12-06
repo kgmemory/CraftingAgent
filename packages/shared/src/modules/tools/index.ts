@@ -4,7 +4,7 @@ import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completi
 import { ApiStreamToolCall } from '../providers/stream'
 import ReplaceToolHandler, { ReplaceTool } from './replace_in_file'
 import WriteFileToolHandler, { WriteFileTool } from './write_to_file'
-import { TaskContext } from '@/task'
+import { TaskContext } from '../task'
 import {TodoTool, TodoToolHandler} from "./todo";
 import {WebSearchTool, WebSearchToolHandler} from "./web_search";
 

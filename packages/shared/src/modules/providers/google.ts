@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { GenerateApiHandler } from "./index";
-import { ProviderConfig } from '../../task';
+import { ProviderConfig } from '../task';
 import { Part } from "@google/genai";
 import Anthropic from '@anthropic-ai/sdk'
 import {ApiStream, ApiStreamImageChunk} from "./stream";

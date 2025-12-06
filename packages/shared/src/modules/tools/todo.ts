@@ -1,7 +1,7 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
 import { ToolHandler } from '.'
 import { ApiStreamToolCall } from '../providers/stream'
-import { TaskContext } from '../../task/types'
+import { TaskContext } from '../task/types'
 
 export const TodoTool: OpenAITool = {
     type: 'function',

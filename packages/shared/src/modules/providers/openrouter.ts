@@ -1,6 +1,6 @@
 import fs from 'fs'
 import {ApiHandler, GenerateApiHandler, AgentImageConfig} from './index'
-import { ProviderConfig } from '../../task'
+import { ProviderConfig } from '../task'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import {convertToOpenAiMessages} from './message_converer'

@@ -1,5 +1,5 @@
 import { ApiHandler } from './index'
-import { ProviderConfig } from '../../task/types'
+import { ProviderConfig } from '../task/types'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { convertToOpenAiMessages } from './message_converer'
