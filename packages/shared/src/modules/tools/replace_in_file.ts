@@ -1,7 +1,7 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
 import { ToolHandler } from './index'
 import { ApiStreamToolCall } from '../providers/stream'
-import { writeFileCore } from '../tool_handlers/file_writer'
+import { writeFileCore } from '../utils/file_writer'
 import { TaskContext } from '../task'
 
 export const ReplaceTool: OpenAITool = {

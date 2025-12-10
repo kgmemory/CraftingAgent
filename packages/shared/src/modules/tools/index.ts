@@ -7,6 +7,7 @@ import WriteFileToolHandler, { WriteFileTool } from './write_to_file'
 import { TaskContext } from '../task'
 import {TodoTool, TodoToolHandler} from "./todo";
 import {WebSearchTool, WebSearchToolHandler} from "./web_search";
+import {ReadDocTool, ReadDocToolHandler} from "./read_doc";
 
 export type AbstractTool = OpenAITool | AnthropicTool | GoogleTool
 
@@ -36,8 +37,6 @@ export enum AbstractDefaultTool {
   APPLY_PATCH = 'apply_patch',
 }
 
-// Array of all tool names for compatibility
-// Automatically generated from the enum values
 export const toolUseNames = Object.values(
   AbstractDefaultTool,
 ) as AbstractDefaultTool[]
@@ -57,13 +56,15 @@ export function getToolHandler(toolName: string): ToolHandler | undefined {
       return new TodoToolHandler()
     case 'web_search':
         return new WebSearchToolHandler()
+    case 'read_doc':
+        return new ReadDocToolHandler()
     default:
       throw new Error(`Unsupported tool: ${toolName}`)
   }
 }
 
 export function getTools(): AbstractTool[] {
-  return [ReplaceTool, WriteFileTool, TodoTool, WebSearchTool]
+  return [ReplaceTool, WriteFileTool, TodoTool, WebSearchTool, ReadDocTool]
 }
 
 /**
