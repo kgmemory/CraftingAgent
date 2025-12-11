@@ -2,6 +2,7 @@ import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completi
 import { ToolHandler } from './index'
 import { ApiStreamToolCall } from '../providers/stream'
 import { TaskContext } from '../task'
+import {WebSearchTool} from "@/modules/tools/web_search";
 
 export const WriteContentTool: OpenAITool = {
   type: 'function',
@@ -25,6 +26,10 @@ export const WriteContentTool: OpenAITool = {
 
 export default class WriteContentToolHandler implements ToolHandler {
   private context: TaskContext | null = null
+
+  tool(): OpenAITool {
+    return WriteContentTool
+  }
 
   setContext(context: TaskContext): void {
     this.context = context

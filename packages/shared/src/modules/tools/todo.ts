@@ -19,6 +19,10 @@ export const TodoTool: OpenAITool = {
 }
 
 export class TodoToolHandler implements ToolHandler {
+    tool(): OpenAITool {
+        return TodoTool
+    }
+
     async execute(toolCall: ApiStreamToolCall, context: TaskContext): Promise<string> {
         return 'Todo item added'
     }

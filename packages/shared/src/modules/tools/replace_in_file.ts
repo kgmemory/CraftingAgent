@@ -54,6 +54,10 @@ Critical rules:
 export default class ReplaceToolHandler implements ToolHandler {
   private context: TaskContext | null = null
 
+  tool(): OpenAITool {
+    return ReplaceTool
+  }
+
   setContext(context: TaskContext): void {
     this.context = context
   }

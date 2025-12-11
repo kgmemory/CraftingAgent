@@ -2,12 +2,12 @@ import { Tool as AnthropicTool } from '@anthropic-ai/sdk/resources/index'
 import { FunctionDeclaration as GoogleTool } from '@google/genai'
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
 import { ApiStreamToolCall } from '../providers/stream'
-import ReplaceToolHandler, { ReplaceTool } from './replace_in_file'
-import WriteFileToolHandler, { WriteFileTool } from './write_to_file'
+import ReplaceToolHandler from './replace_in_file'
+import WriteFileToolHandler from './write_to_file'
 import { TaskContext } from '../task'
-import {TodoTool, TodoToolHandler} from "./todo";
-import {WebSearchTool, WebSearchToolHandler} from "./web_search";
-import {ReadDocTool, ReadDocToolHandler} from "./read_doc";
+import { TodoToolHandler } from "./todo";
+import { WebSearchToolHandler } from "./web_search";
+import { ReadDocToolHandler } from "./read_doc";
 
 export type AbstractTool = OpenAITool | AnthropicTool | GoogleTool
 
@@ -42,6 +42,7 @@ export const toolUseNames = Object.values(
 ) as AbstractDefaultTool[]
 
 export interface ToolHandler {
+  tool(): OpenAITool
   setContext?(context: TaskContext): void
   execute(tool: ApiStreamToolCall, context?: TaskContext): Promise<string>
 }
@@ -61,10 +62,6 @@ export function getToolHandler(toolName: string): ToolHandler | undefined {
     default:
       throw new Error(`Unsupported tool: ${toolName}`)
   }
-}
-
-export function getTools(): AbstractTool[] {
-  return [ReplaceTool, WriteFileTool, TodoTool, WebSearchTool, ReadDocTool]
 }
 
 /**

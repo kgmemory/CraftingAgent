@@ -48,6 +48,10 @@ export const ReplaceContentTool: OpenAITool = {
 export default class ReplaceContentToolHandler implements ToolHandler {
   private context: TaskContext | null = null
 
+  tool(): OpenAITool {
+    return ReplaceContentTool
+  }
+
   setContext(context: TaskContext): void {
     this.context = context
   }

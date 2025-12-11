@@ -27,6 +27,10 @@ export class ReadDocToolHandler implements ToolHandler {
     
     private context: TaskContext | null = null
 
+    tool(): OpenAITool {
+        return ReadDocTool
+    }
+
     setContext(context: TaskContext): void {
         this.context = context
     }

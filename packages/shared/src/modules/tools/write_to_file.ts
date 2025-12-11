@@ -1,7 +1,7 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
 import { ToolHandler } from './index'
 import { ApiStreamToolCall } from '../providers/stream'
-import { writeFileCore } from '../tool_handlers/file_writer'
+import { writeFileCore } from '../utils/file_writer'
 import { TaskContext } from '../task/types'
 
 export const WriteFileTool: OpenAITool = {
@@ -30,6 +30,10 @@ export const WriteFileTool: OpenAITool = {
 
 export default class WriteFileToolHandler implements ToolHandler {
   private context: TaskContext | null = null
+
+  tool(): OpenAITool {
+    return WriteFileTool
+  }
 
   setContext(context: TaskContext): void {
     this.context = context

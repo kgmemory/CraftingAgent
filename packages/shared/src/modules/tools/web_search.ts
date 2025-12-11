@@ -22,6 +22,10 @@ export class WebSearchToolHandler implements ToolHandler {
     
     private context: TaskContext | null = null
 
+    tool(): OpenAITool {
+        return WebSearchTool
+    }
+
     setContext(context: TaskContext): void {
         this.context = context
     }

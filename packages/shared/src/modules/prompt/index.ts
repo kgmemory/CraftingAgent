@@ -1,2 +1,2 @@
-export { default as buildSystemPrompt } from './prompt'
-
+export { ISystemPromptBuilder } from './prompt'
+export { DefaultSystemPromptBuilder } from './prompt'

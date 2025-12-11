@@ -1,10 +1,15 @@
-export default function buildSystemPrompt(userInstruction: string): string {
-  return `${AGENT_ROLE}
+export interface ISystemPromptBuilder {
+    buildSystemPrompt(): string
+}
+
+export const DefaultSystemPromptBuilder: ISystemPromptBuilder =  {
+    buildSystemPrompt(): string {
+        return `${AGENT_ROLE}
 ${TOOL_USE_GUIDELINE_SECTION}
 ${TODO_LIST_SECTIONS}
 ${CAPABILITIES}
-${USER_INSTRUCTIONS(userInstruction)}
 `
+    }
 }
 
 function AGENT_ROLE(): string {
