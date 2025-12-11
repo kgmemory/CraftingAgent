@@ -73,6 +73,10 @@ export class Task {
 
   private async loadHistoryMessages() {
     const messages = await this.storage.getChatMessagesByTaskId(this.taskID)
+    logger.info({
+      taskId: this.taskID,
+      messages: messages,
+    }, 'Query chat message history')
     this.historyMessages = messages.map((msg) => {
       const role = msg.role === 'user' || msg.role === 'assistant' ? msg.role : 'user'
       const content = convertToAnthropicContentBlocks(msg.content || [])
@@ -101,6 +105,7 @@ export class Task {
     }
     if (this.userInstruction) {
       userMessageBlocks.push({ type: 'text', text: this.userInstruction })
+      userMessageBlocks.push({ type: 'text', text: `<enviorment>${await this.systemPromptBuilder.buildEnvironmentDetails()}</enviorment>`})
       this.userInstruction = ''
     }
     await this.saveMessage('user', userMessageBlocks)
@@ -111,7 +116,7 @@ export class Task {
     await this.initTask()
 
     const handler = this.buildApiHandler(this.modelConfig?.agentModel)
-    const systemPrompt = this.systemPromptBuilder.buildSystemPrompt()
+    const systemPrompt = await this.systemPromptBuilder.buildSystemPrompt()
 
     const taskInLoop = true
 

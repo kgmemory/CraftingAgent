@@ -1,14 +1,19 @@
 export interface ISystemPromptBuilder {
-    buildSystemPrompt(): string
+    buildSystemPrompt(): Promise<string>
+    buildEnvironmentDetails(): Promise<string>
 }
 
 export const DefaultSystemPromptBuilder: ISystemPromptBuilder =  {
-    buildSystemPrompt(): string {
-        return `${AGENT_ROLE}
-${TOOL_USE_GUIDELINE_SECTION}
-${TODO_LIST_SECTIONS}
-${CAPABILITIES}
+    async buildSystemPrompt(): Promise<string> {
+        return `${AGENT_ROLE()}
+${TOOL_USE_GUIDELINE_SECTION()}
+${TODO_LIST_SECTIONS()}
+${CAPABILITIES()}
 `
+    },
+
+    async buildEnvironmentDetails(): Promise<string> {
+        return ''
     }
 }
 
