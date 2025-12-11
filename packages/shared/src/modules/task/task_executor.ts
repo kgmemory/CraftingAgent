@@ -179,7 +179,10 @@ export class Task {
       await this.saveMessage('assistant', assistantContentBlocks)
       if (lastToolCall?.function?.name) {
         const toolName = lastToolCall.function.name
-        const toolHandler = this.taskContext.tools?.find((tool) => tool.tool().function.name === toolName)
+        const toolHandler = this.taskContext.tools?.find((tool) => {
+          const toolDef = tool.tool()
+          return toolDef.type === 'function' && toolDef.function.name === toolName
+        })
         if (toolHandler) {
           lastToolCallResult = await toolHandler.execute(lastToolCall, this.taskContext)
           logger.info({

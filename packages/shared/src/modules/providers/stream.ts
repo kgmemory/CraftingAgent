@@ -1,3 +1,6 @@
+import Anthropic from '@anthropic-ai/sdk'
+import { AbstractTool } from '../tools/index'
+
 export type ApiStream = AsyncGenerator<ApiStreamChunk>
 export type ApiStreamChunk =
   | ApiStreamTextChunk
@@ -41,8 +44,8 @@ export interface ApiStreamUsageChunk {
   outputTokens: number
   cacheWriteTokens?: number
   cacheReadTokens?: number
-  thoughtsTokenCount?: number // openrouter
-  totalCost?: number // openrouter
+  thoughtsTokenCount?: number
+  totalCost?: number
 }
 
 export interface ApiStreamToolCallsChunk {
@@ -51,12 +54,33 @@ export interface ApiStreamToolCallsChunk {
 }
 
 export interface ApiStreamToolCall {
-  call_id?: string // The call / request ID associated with this tool call
-  // Information about the tool being called
+  call_id?: string
   function: {
-    id?: string // The tool call ID
+    id?: string
     name?: string
     arguments?: any
   }
+}
+
+export interface ApiHandler {
+  chatCompletion: (
+    systemPrompt: string,
+    messages: Anthropic.Messages.MessageParam[],
+    tools?: AbstractTool[],
+  ) => ApiStream
+}
+
+export interface GenerateApiHandler {
+  generateContent: (
+    userInstruction: string,
+    messages: Anthropic.Messages.MessageParam[],
+    config: AgentImageConfig,
+  ) => Promise<ApiStreamImageChunk>
+}
+
+export type AgentImageConfig = {
+  aspectRatio?: string
+  imageSize?: string
+  googleSearch?: boolean
 }
 

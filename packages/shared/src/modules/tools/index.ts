@@ -5,9 +5,8 @@ import { ApiStreamToolCall } from '../providers/stream'
 import ReplaceToolHandler from './replace_in_file'
 import WriteFileToolHandler from './write_to_file'
 import { TaskContext } from '../task'
-import { TodoToolHandler } from "./todo";
+import { TodoToolHandler } from "./update_todo_list";
 import { WebSearchToolHandler } from "./web_search";
-import { ReadDocToolHandler } from "./read_doc";
 
 export type AbstractTool = OpenAITool | AnthropicTool | GoogleTool
 
@@ -47,32 +46,14 @@ export interface ToolHandler {
   execute(tool: ApiStreamToolCall, context?: TaskContext): Promise<string>
 }
 
-export function getToolHandler(toolName: string): ToolHandler | undefined {
-  switch (toolName) {
-    case 'replace_in_file':
-      return new ReplaceToolHandler()
-    case 'write_to_file':
-      return new WriteFileToolHandler()
-    case 'todo':
-      return new TodoToolHandler()
-    case 'web_search':
-        return new WebSearchToolHandler()
-    case 'read_doc':
-        return new ReadDocToolHandler()
-    default:
-      throw new Error(`Unsupported tool: ${toolName}`)
-  }
-}
-
 /**
  * Converts a ClineToolSpec into an Anthropic Tool definition
  */
 export function convertToAnthropicTool  (tool: OpenAITool): AnthropicTool {
-    // Build the properties object for parameters
     const properties: Record<string, any> = {}
     const required: string[] = []
 
-    if (tool.function?.parameters?.properties) {
+    if (tool.type === 'function' && tool.function?.parameters?.properties) {
         const requiredArray = Array.isArray(tool.function.parameters.required) 
             ? tool.function.parameters.required 
             : []
@@ -81,25 +62,22 @@ export function convertToAnthropicTool  (tool: OpenAITool): AnthropicTool {
             if (requiredParams.has(paramName)) {
                 required.push(paramName)
             }
-            const paramType: string = param.type || "string"
+            const typedParam = param as any
+            const paramType: string = typedParam.type || "string"
 
             const paramSchema: any = {
                 type: paramType,
-                description: param.description,
+                description: typedParam.description,
             }
 
-            // Add items for array types
-            if (paramType === "array" && param.items) {
-                paramSchema.items = param.items
+            if (paramType === "array" && typedParam.items) {
+                paramSchema.items = typedParam.items
             }
 
-            // Add properties for object types
-            if (paramType === "object" && param.properties) {
-                paramSchema.properties = param.properties
+            if (paramType === "object" && typedParam.properties) {
+                paramSchema.properties = typedParam.properties
             }
 
-            // Preserve any additional JSON Schema fields from MCP tools
-            // (e.g., enum, format, minimum, maximum, etc.)
             const reservedKeys = new Set([
                 "name",
                 "required",
@@ -112,19 +90,18 @@ export function convertToAnthropicTool  (tool: OpenAITool): AnthropicTool {
                 "items",
                 "properties",
             ])
-            for (const key in param) {
-                if (!reservedKeys.has(key) && param[key] !== undefined) {
-                    paramSchema[key] = param[key]
+            for (const key in typedParam) {
+                if (!reservedKeys.has(key) && typedParam[key] !== undefined) {
+                    paramSchema[key] = typedParam[key]
                 }
             }
             properties[paramName] = paramSchema
         }
     }
 
-    // Build the Tool object
     const toolInputSchema: AnthropicTool = {
-        name: tool.function.name,
-        description: tool.function.description,
+        name: tool.type === 'function' ? tool.function.name : '',
+        description: tool.type === 'function' ? tool.function.description : '',
         input_schema: {
             type: "object",
             properties,
