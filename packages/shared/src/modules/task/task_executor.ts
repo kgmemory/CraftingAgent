@@ -112,6 +112,9 @@ export class Task {
   }
 
   async *startTask(userInstruction: string): ApiStream {
+    logger.info({
+      userInstruction: userInstruction,
+    }, 'start task')
     this.userInstruction = userInstruction
     await this.initTask()
 
