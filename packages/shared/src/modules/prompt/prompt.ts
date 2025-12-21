@@ -1,6 +1,8 @@
+import {TaskContext} from "@/modules";
+
 export interface ISystemPromptBuilder {
     buildSystemPrompt(): Promise<string>
-    buildEnvironmentDetails(): Promise<string>
+    buildEnvironmentDetails(taskContext: TaskContext): Promise<string>
 }
 
 export const DefaultSystemPromptBuilder: ISystemPromptBuilder =  {
@@ -12,7 +14,7 @@ ${CAPABILITIES()}
 `
     },
 
-    async buildEnvironmentDetails(): Promise<string> {
+    async buildEnvironmentDetails(taskContext: TaskContext): Promise<string> {
         return ''
     }
 }

@@ -77,14 +77,15 @@ export class Task {
       taskId: this.taskID,
       messages: messages,
     }, 'Query chat message history')
-    this.historyMessages = messages.map((msg) => {
-      const role = msg.role === 'user' || msg.role === 'assistant' ? msg.role : 'user'
-      const content = convertToAnthropicContentBlocks(msg.content || [])
-      return {
-        role,
-        content,
-      }
-    })
+    this.historyMessages = messages
+      .filter((msg) => msg.role === 'user' || msg.role === 'assistant')
+      .map((msg) => {
+        const content = convertToAnthropicContentBlocks(msg.content || [])
+        return {
+          role: msg.role as 'user' | 'assistant',
+          content,
+        }
+      })
 
     if (messages.length > 0) {
       const maxRound = Math.max(
@@ -105,7 +106,7 @@ export class Task {
     }
     if (this.userInstruction) {
       userMessageBlocks.push({ type: 'text', text: this.userInstruction })
-      userMessageBlocks.push({ type: 'text', text: `<enviorment>${await this.systemPromptBuilder.buildEnvironmentDetails()}</enviorment>`})
+      userMessageBlocks.push({ type: 'text', text: `<enviorment>${await this.systemPromptBuilder.buildEnvironmentDetails(this.taskContext)}</enviorment>`})
       this.userInstruction = ''
     }
     await this.saveMessage('user', userMessageBlocks)
@@ -120,13 +121,16 @@ export class Task {
 
     const handler = this.buildApiHandler(this.modelConfig?.agentModel)
     const systemPrompt = await this.systemPromptBuilder.buildSystemPrompt()
-
+    await this.saveMessage('system', [{ type: 'text', text: systemPrompt }])
+    
     const taskInLoop = true
 
     let lastToolCall: ApiStreamToolCall | undefined
     let lastToolCallResult: string | undefined
     while (taskInLoop) {
       await this.buildUserTaskMessage(lastToolCall, lastToolCallResult)
+      lastToolCall = undefined
+      lastToolCallResult = undefined
       const stream = handler.chatCompletion(systemPrompt, this.historyMessages, this.taskContext.tools?.map((tool) => tool.tool()) || [])
 
       let accumulatedText = ''
@@ -208,11 +212,12 @@ export class Task {
   }
 
   private async saveMessage(
-    role: 'user' | 'assistant',
+    role: 'user' | 'assistant' | 'system',
     blocks: Anthropic.ContentBlockParam[],
   ) {
-    this.historyMessages.push({ role: role, content: blocks })
-
+    if (role === 'user' || role === 'assistant') {
+      this.historyMessages.push({ role: role, content: blocks })
+    }
     await this.storage.createChatMessage({
       taskId: this.taskID,
       projectId: this.projectId,

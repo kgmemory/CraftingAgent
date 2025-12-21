@@ -6,6 +6,7 @@ export interface TaskContext {
   variables?: Record<string, string>
   systemPromptBuilder?: ISystemPromptBuilder
   tools?: ToolHandler[]
+  workspacePath?: string
 }
 
 /*

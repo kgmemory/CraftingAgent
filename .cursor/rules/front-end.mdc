@@ -1,0 +1,66 @@
+---
+alwaysApply: false
+---
+前端代码仓库与工程规范文档
+一、 目录组织规范 (Directory Structure)
+为了保持项目的高度可维护性，遵循“功能内聚，层次分明”的原则。
+目录	说明	备注
+/api	服务端接口请求定义	建议按业务模块分子目录
+/assets	静态资源 (Images, Fonts, SVG)	严禁存放临时文件
+/components	通用 UI 组件	包含 ui/
+ (原子组件) 和 business/
+ (业务组件)
+/config	静态配置文件	环境配置、常量定义、枚举
+/context	业务状态管理中心	存放 Zustand Store 定义
+/hooks	复用逻辑钩子	必须以 use
+ 开头命名
+/types	TypeScript 类型声明	分为 entity
+ (后端模型) 与 app
+ (前端状态)
+/utils	纯逻辑工具函数	必须是无副作用的纯函数
+核心状态管理 (Zustand)
+项目采用 Zustand 替代传统的 Context API 以获取更好的性能。
+● 文件：/context/WorkspaceStore.ts
+● 逻辑： 状态（States）与操作（Actions）需在同一 Store 中内聚。
+● 配套 Hook：/hooks/useWorkspace.ts 用于封装对 Store 的选择性监听（Selector）。
+
+二、 技术栈选型 (Tech Stack)
+● 核心框架：React 19 (利用新特性如 use API, Actions)
+● 样式方案：TailwindCSS + Shadcn UI (高度自定义的无头组件)
+● 状态管理：Zustand
+● 日志系统：Pino (配合 pino-pretty 提供工业级终端反馈)
+TypeScript
+// @/utils/logger.ts
+import pino from 'pino'
+
+export const logger = pino({
+  level: process.env.NEXT_PUBLIC_LOG_LEVEL || 'info',
+  transport: process.env.NODE_ENV === 'development' ? {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      translateTime: 'HH:MM:ss',
+      ignore: 'pid,hostname',
+    },
+  } : undefined,
+})
+
+三、 视觉与样式规范 (Design Philosophy)
+1. 审美导向：Apple Aesthetics
+● 极简主义： 留白充分，避免视觉拥挤。
+● 微动效： 使用 framer-motion 实现细腻的入场与交互动画。
+● 色彩： 采用高对比度的黑白灰，辅以极低饱和度的品牌色。
+2. 严禁事项
+● 图标规范： 严禁使用任何 Emoji。统一使用 Lucide React 或定制的 SVG 图标。
+● 排版： 严格遵循非衬线字体排版，优先调用系统默认字体栈（-apple-system）。
+
+四、 代码编写规则 (Coding Rules)
+1. 模块引入规范
+● 无后缀化： 引入文件时，禁止带上文件扩展名（.ts, .tsx, .js）。
+  ○ ✅ import { ToolHandler } from './index'
+  ○ ❌ import { ToolHandler } from './index.js'
+● 路径别名： 统一使用 @/ 别名映射到 src 目录。
+2. 代码风格 (Code Style)
+● 分号： 行末不使用分号（No Semicolons）。
+● 缩进： 统一使用 2 空格。
+● 函数声明： 优先使用箭头函数声明简单的组件，复杂逻辑建议使用 function 关键字以获得更好的 Hoisting 处理。

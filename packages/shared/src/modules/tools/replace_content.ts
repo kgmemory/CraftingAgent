@@ -60,7 +60,16 @@ export default class ReplaceContentToolHandler implements ToolHandler {
     tool: ApiStreamToolCall,
     context?: TaskContext,
   ): Promise<string> {
-    const parameters = tool.function.arguments as {
+    let args = tool.function.arguments
+    if (typeof args === 'string') {
+      try {
+        args = JSON.parse(args)
+      } catch (error) {
+        throw new Error(`Failed to parse tool arguments: ${error}`)
+      }
+    }
+
+    const parameters = args as {
       diff: string
     }
 
