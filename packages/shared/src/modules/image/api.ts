@@ -1,8 +1,8 @@
 import { ProviderConfig } from '../task/types'
 import { GoogleHandler } from '../providers/google'
 import { OpenRouterHandler } from '../providers/openrouter'
-import { GenerateApiHandler } from '../providers/stream'
-import { GenerateImageConfig } from './types'
+import { GenerateApiHandler, AgentImageConfig, ApiStreamImageChunk } from '../providers/stream'
+import Anthropic from '@anthropic-ai/sdk'
 
 function buildGenerateApiHandler(providerConfig?: ProviderConfig): GenerateApiHandler {
     if (!providerConfig?.provider) {
@@ -19,8 +19,12 @@ function buildGenerateApiHandler(providerConfig?: ProviderConfig): GenerateApiHa
     }
 }
 
-export function generateImage(generateImageConfig?: GenerateImageConfig): GenerateApiHandler {
-    buildGenerateApiHandler(generateImageConfig?.providerConfig)
-    const generateApiHandler = buildGenerateApiHandler(generateImageConfig?.providerConfig)
-    return generateApiHandler.generateContent(generateImageConfig?.userInstruction, generateImageConfig?.messages, generateImageConfig?.config)
+export async function generateImage(
+  userInstruction: string,
+  messages: Anthropic.Messages.MessageParam[],
+  config: AgentImageConfig,
+  providerConfig?: ProviderConfig
+): Promise<ApiStreamImageChunk> {
+    const generateApiHandler = buildGenerateApiHandler(providerConfig)
+    return await generateApiHandler.generateContent(userInstruction, messages, config)
 }

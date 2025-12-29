@@ -6,4 +6,5 @@ export * from './utils'
 export * from './providers'
 export * from './tools'
 export * from './task'
+export * from './image'
 

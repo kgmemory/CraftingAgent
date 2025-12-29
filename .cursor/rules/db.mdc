@@ -1,0 +1,89 @@
+---
+alwaysApply: false
+---
+数据库结构说明
+表结构定义
+1. chat_messages (聊天消息表)
+存储对话消息的详细信息，支持多轮对话管理。
+sql
+CREATE TABLE chat_messages (
+    id                 TEXT    NOT NULL PRIMARY KEY,  -- 消息唯一标识
+    task_id            TEXT    NOT NULL,              -- 关联任务ID
+    project_id         TEXT    NOT NULL,              -- 关联项目ID
+    conversation_round INTEGER NOT NULL,              -- 对话轮次
+    message_order      INTEGER NOT NULL,              -- 消息顺序
+    role               TEXT    NOT NULL,              -- 角色(user/assistant/system)
+    content            TEXT,                          -- 消息内容
+    created_at         INTEGER NOT NULL,              -- 创建时间戳
+    updated_at         INTEGER NOT NULL               -- 更新时间戳
+);
+2. configs (配置表)
+存储系统配置信息，采用分类键值对结构。
+sql
+CREATE TABLE configs (
+    id         TEXT    NOT NULL PRIMARY KEY,  -- 配置唯一标识
+    category   TEXT    NOT NULL,              -- 配置分类
+    key        TEXT    NOT NULL,              -- 配置键名
+    val        TEXT,                          -- 配置值(JSON格式)
+    created_at INTEGER NOT NULL,              -- 创建时间戳
+    updated_at INTEGER NOT NULL               -- 更新时间戳
+);
+category 分类说明
+当 category = 'llm' 时：
+key: 表示模型名称 
+示例：minimax、openai、claude 等
+val: 存储该模型的 JSON 格式配置详情
+json
+{
+    "provider": "minimax",           // 服务提供商
+    "apiKey": "",                    // API密钥
+    "baseUrl": "https://api.minimaxi.com/anthropic",  // API基础URL
+    "modelName": "MiniMax-M2-Stable" // 模型名称
+  }
+```
+
+**示例数据：**
+```
+id: OD5Z7br8C_ZlAZmgQQge5
+category: llm
+key: minimax
+val: {"provider":"minimax","apiKey":"","baseUrl":"https://api.minimaxi.com/anthropic","modelName":"MiniMax-M2-Stable"}
+created_at: 1764050167
+updated_at: 1764120504
+3. projects (项目表)
+管理项目基本信息和配置。
+sql
+CREATE TABLE projects (
+    id           TEXT    NOT NULL PRIMARY KEY,  -- 项目唯一标识
+    name         TEXT    NOT NULL,              -- 项目名称
+    settings     TEXT,                          -- 项目设置(JSON)
+    model_config TEXT,                          -- 模型配置(JSON)
+    created_at   INTEGER NOT NULL,              -- 创建时间戳
+    updated_at   INTEGER NOT NULL               -- 更新时间戳
+);
+4. tasks (任务表)
+管理项目下的具体任务。
+sql
+CREATE TABLE tasks (
+    id         TEXT    NOT NULL PRIMARY KEY,  -- 任务唯一标识
+    project_id TEXT    NOT NULL,              -- 关联项目ID
+    name       TEXT    NOT NULL,              -- 任务名称
+    created_at INTEGER NOT NULL,              -- 创建时间戳
+    updated_at INTEGER NOT NULL               -- 更新时间戳
+);
+```
+
+---
+
+## 数据关系
+```
+projects (1) ──→ (N) tasks (1) ──→ (N) chat_messages
+                                      ↓
+                                  project_id (外键关联)
+使用建议
+1. 时间戳统一使用 Unix 时间戳（整数类型）
+2. JSON 配置字段建议添加 JSON 验证逻辑
+3. 考虑添加索引： 
+  ○ chat_messages(task_id, conversation_round)
+  ○ tasks(project_id)
+  ○ configs(category, key)

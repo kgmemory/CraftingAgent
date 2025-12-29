@@ -167,8 +167,9 @@ export class OpenRouterHandler implements ApiHandler, GenerateApiHandler {
     const data: any = await response.json()
     const result: ApiStreamImageChunk = {
       type: 'image',
-      data: undefined,
+      data: [],
       text: undefined,
+      thinking: undefined,
     }
     const content = data?.choices?.[0]?.message?.content
     if (Array.isArray(content)) {
@@ -176,11 +177,20 @@ export class OpenRouterHandler implements ApiHandler, GenerateApiHandler {
         if (part.type === 'text' && part.text) {
           result.text = result.text ? `${result.text}\n${part.text}` : part.text
         } else if (part.type === 'image_url' && part.image_url?.url) {
-          result.data = part.image_url.url
+          result.data!.push(part.image_url.url)
         }
       }
     } else if (typeof content === 'string') {
       result.text = content
+      result.thinking =  data?.choices?.[0]?.message?.reasoning
+    }
+    const images = data?.choices?.[0]?.message?.images
+    if (Array.isArray(images)) {
+      for (const img of images) {
+        if (img?.image_url?.url) {
+          result.data!.push(img.image_url.url)
+        }
+      }
     }
 
     return result

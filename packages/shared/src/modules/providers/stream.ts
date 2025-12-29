@@ -18,8 +18,9 @@ export interface ApiStreamTextChunk {
 
 export interface ApiStreamImageChunk {
   type: 'image'
-  data: string | undefined
+  data: string[] | undefined
   text: string | undefined
+  thinking: string | undefined
 }
 
 export interface ApiStreamReasoningChunk {

@@ -1,4 +1,4 @@
-import {TaskContext} from "@/modules";
+import {TaskContext} from "../task";
 
 export interface ISystemPromptBuilder {
     buildSystemPrompt(): Promise<string>
