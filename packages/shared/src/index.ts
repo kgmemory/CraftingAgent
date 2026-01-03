@@ -1,2 +1,9 @@
-// Main entry point for the shared package
-export * from './modules'
+export * from './types'
+export * from './logger'
+export * from './storage'
+export * from './prompt'
+export * from './utils'
+export * from './providers'
+export * from './tools'
+export { Task } from './task'
+export * from './image'

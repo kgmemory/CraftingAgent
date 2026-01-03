@@ -15,7 +15,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "copy:renpy": "node copy-to-renpy.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
