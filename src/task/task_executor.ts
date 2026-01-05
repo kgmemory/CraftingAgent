@@ -10,6 +10,7 @@ import { convertToAnthropicContentBlocks, convertContentBlock } from './converte
 import { GoogleHandler } from '../providers/google'
 import { logger } from '../logger'
 import { ISystemPromptBuilder, DefaultSystemPromptBuilder } from '../prompt'
+import { nanoid } from 'nanoid'
 
 export class Task {
   private projectId: string
@@ -217,6 +218,7 @@ export class Task {
       this.historyMessages.push({ role: role, content: blocks })
     }
     await this.storage.createChatMessage({
+      id: nanoid(),
       taskId: this.taskID,
       projectId: this.projectId,
       conversationRound: this.conversationRound,

@@ -1,7 +1,7 @@
 import { ModelConfig } from './common'
 
 export interface Task {
-  id?: string
+  id: string
   projectId?: string
   name?: string
   createdAt?: Date
@@ -19,7 +19,7 @@ export interface ContentBlock {
 }
 
 export interface ChatMessage {
-  id?: string
+  id: string
   projectId?: string
   taskId?: string
   conversationRound?: number
@@ -31,7 +31,7 @@ export interface ChatMessage {
 }
 
 export interface Project {
-  id?: string
+  id: string
   name?: string
   settings?: Record<string, any>
   modelConfig?: ModelConfig
@@ -40,7 +40,7 @@ export interface Project {
 }
 
 export interface Config {
-  id?: string
+  id: string
   category?: string
   key?: string
   val?: string
