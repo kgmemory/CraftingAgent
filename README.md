@@ -1,4 +1,4 @@
-# @crafting-agent/shared
+# @grisaiaevy/crafting-agent
 
 A TypeScript library for building AI agents with support for multiple LLM providers.
 
@@ -14,13 +14,13 @@ A TypeScript library for building AI agents with support for multiple LLM provid
 ## Installation
 
 ```bash
-npm install @crafting-agent/shared
+npm install @grisaiaevy/crafting-agent
 ```
 
 ## Quick Start
 
 ```typescript
-import { Task, TaskStorage, ModelConfig } from '@crafting-agent/shared'
+import { Task, TaskStorage, ModelConfig } from '@grisaiaevy/crafting-agent'
 
 // Initialize task storage
 const storage = new TaskStorage(/* your storage config */)
@@ -84,7 +84,7 @@ const stream = task.startTask(userInstruction: string): AsyncGenerator<ApiStream
 Create custom tools by implementing the `Tool` interface:
 
 ```typescript
-import { Tool, ToolDefinition } from '@crafting-agent/shared'
+import { Tool, ToolDefinition } from '@grisaiaevy/crafting-agent'
 
 class MyTool implements Tool {
   tool(): ToolDefinition {
