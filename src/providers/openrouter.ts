@@ -1,4 +1,3 @@
-import fs from 'fs'
 import {ApiHandler, GenerateApiHandler, AgentImageConfig, ApiStream, ApiStreamImageChunk} from './index'
 import { ProviderConfig, AbstractTool } from '../types'
 import Anthropic from '@anthropic-ai/sdk'
@@ -211,18 +210,7 @@ export class OpenRouterHandler implements ApiHandler, GenerateApiHandler {
             ) {
               return part
             }
-            const source: any = part.source
-            const mediaType = source.media_type || this.detectMimeTypeFromPath(source.path)
-            const { base64 } = await this.encodeImageToBase64(source.path, mediaType)
-            const updatedSource = {
-              type: 'base64' as const,
-              media_type: mediaType,
-              data: base64,
-            }
-            return {
-              ...part,
-              source: updatedSource,
-            }
+            return part
           }),
         )
         return {
@@ -233,36 +221,36 @@ export class OpenRouterHandler implements ApiHandler, GenerateApiHandler {
     )
   }
 
-  private async encodeImageToBase64(
-    imagePath: string,
-    mediaType = 'image/jpeg',
-  ): Promise<{ dataUrl: string; base64: string; mediaType: string }> {
-    const imageBuffer = await fs.promises.readFile(imagePath)
-    const base64Image = imageBuffer.toString('base64')
-    return {
-      dataUrl: `data:${mediaType};base64,${base64Image}`,
-      base64: base64Image,
-      mediaType,
-    }
-  }
+  // private async encodeImageToBase64(
+  //   imagePath: string,
+  //   mediaType = 'image/jpeg',
+  // ): Promise<{ dataUrl: string; base64: string; mediaType: string }> {
+  //   const imageBuffer = await fs.promises.readFile(imagePath)
+  //   const base64Image = imageBuffer.toString('base64')
+  //   return {
+  //     dataUrl: `data:${mediaType};base64,${base64Image}`,
+  //     base64: base64Image,
+  //     mediaType,
+  //   }
+  // }
 
-  private detectMimeTypeFromPath(imagePath: string): string {
-    const extension = imagePath.split('.').pop()?.toLowerCase()
-    switch (extension) {
-      case 'png':
-        return 'image/png'
-      case 'gif':
-        return 'image/gif'
-      case 'webp':
-        return 'image/webp'
-      case 'bmp':
-        return 'image/bmp'
-      case 'svg':
-        return 'image/svg+xml'
-      case 'jpg':
-      case 'jpeg':
-      default:
-        return 'image/jpeg'
-    }
-  }
+  // private detectMimeTypeFromPath(imagePath: string): string {
+  //   const extension = imagePath.split('.').pop()?.toLowerCase()
+  //   switch (extension) {
+  //     case 'png':
+  //       return 'image/png'
+  //     case 'gif':
+  //       return 'image/gif'
+  //     case 'webp':
+  //       return 'image/webp'
+  //     case 'bmp':
+  //       return 'image/bmp'
+  //     case 'svg':
+  //       return 'image/svg+xml'
+  //     case 'jpg':
+  //     case 'jpeg':
+  //     default:
+  //       return 'image/jpeg'
+  //   }
+  // }
 }

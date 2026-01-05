@@ -1,7 +1,7 @@
 {
   "name": "@crafting-agent/shared",
   "version": "0.0.1",
-  "private": true,
+  "description": "A TypeScript library for building AI agents with support for multiple LLM providers",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -16,8 +16,29 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "lint": "eslint src/",
-    "copy:renpy": "node copy-to-renpy.js"
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "ai",
+    "agent",
+    "llm",
+    "anthropic",
+    "openai",
+    "google",
+    "typescript",
+    "streaming",
+    "tools"
+  ],
+  "author": "Crafting Agent",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kgmemory/CraftingAgent"
+  },
+  "bugs": {
+    "url": "https://github.com/kgmemory/CraftingAgent/issues"
+  },
+  "homepage": "https://github.com/kgmemory/CraftingAgent#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
     "@google/genai": "^1.28.0",
@@ -29,7 +50,6 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.10.7",
     "typescript": "^5.7.3"
   }
 }

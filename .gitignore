@@ -14,10 +14,6 @@
 ehthumbs.db
 Thumbs.db
 
-# Shared package specific
-packages/shared/dist/
-packages/shared/node_modules/
-
 # Dependencies
 node_modules/
 .pnp

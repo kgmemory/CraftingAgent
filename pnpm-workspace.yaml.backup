@@ -1,8 +1,0 @@
-packages:
-  - 'md-ai'
-  - 'md-ai/apps/*'
-  - 'md-ai/packages/*'
-  - 'renpyAgent'
-  - 'renpyAgent/webui'
-  - 'packages/*'
-
