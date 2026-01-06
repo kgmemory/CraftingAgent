@@ -12,7 +12,7 @@ import { logger } from '../logger'
 import { ISystemPromptBuilder, DefaultSystemPromptBuilder } from '../prompt'
 import { nanoid } from 'nanoid'
 
-export class Task {
+export class Agent {
   private projectId: string
   private taskID: string
   private modelConfig: ModelConfig

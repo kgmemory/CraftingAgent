@@ -10,4 +10,4 @@ export type {
 export type { Task as TaskType } from '../types'
 export { TaskStorage } from '../storage'
 export { convertToAnthropicContentBlocks, convertContentBlock } from './converter'
-export { Task } from './task_executor'
+export { Agent } from './task_executor'
