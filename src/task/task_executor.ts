@@ -59,13 +59,16 @@ export class Agent {
         })
     }
 
-    if (this.modelConfig?.agentModel?.provider) {
-      const modelConfig = await this.storage.getConfigByKey(this.modelConfig.agentModel.provider, 'llm')
+    if (!this.modelConfig.agentModel) {
+      throw new Error('Agent model config is required')
+    }
+    if (!this.modelConfig.agentModel.apiKey) {
+      const modelConfig = await this.storage.getConfigByKey(this.modelConfig.agentModel?.provider || '', 'llm')
       if (modelConfig) {
         this.modelConfig.agentModel = JSON.parse(modelConfig.val || '{}')
+      } else {
+        throw new Error(`Agent model config not found for provider: ${this.modelConfig.agentModel?.provider}`)
       }
-    } else {
-      throw new Error('Agent model provider is required')
     }
     await this.loadHistoryMessages()
   }

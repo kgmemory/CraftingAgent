@@ -19,6 +19,7 @@ export class MinimaxHandler implements ApiHandler {
         this.client = new Anthropic({
           baseURL: 'https://api.minimaxi.com/anthropic',
           apiKey: this.minimaxConfig.apiKey,
+          dangerouslyAllowBrowser: true,
         })
         } catch (error: any) {
         throw new Error(`Error creating MiniMax client: ${error.message}`)
