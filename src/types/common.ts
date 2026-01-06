@@ -1,5 +1,5 @@
 export interface ProviderConfig {
-  provider?: 'minimax' | 'doubao' | 'openrouter' | 'google'
+  provider?: string
   apiKey?: string
   baseUrl?: string
   modelName?: string
