@@ -21,6 +21,7 @@ export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
       this.client = new OpenAI({
         baseURL: this.providerConfig.baseUrl,
         apiKey: this.providerConfig.apiKey,
+        dangerouslyAllowBrowser: true,
       })
     } catch (error: any) {
       throw new Error(`openai: error create client: ${error.message}`)
