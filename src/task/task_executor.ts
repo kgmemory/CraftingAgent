@@ -8,6 +8,7 @@ import { DoubaoHandler } from '../providers/doubao'
 import { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages'
 import { convertToAnthropicContentBlocks, convertContentBlock } from './converter'
 import { GoogleHandler } from '../providers/google'
+import { OpenAIHandler } from '../providers/openai'
 import { logger } from '../logger'
 import { ISystemPromptBuilder, DefaultSystemPromptBuilder } from '../prompt'
 import { nanoid } from 'nanoid'
@@ -246,7 +247,7 @@ export class Agent {
       case 'openrouter':
         return new OpenRouterHandler(providerConfig)
       default:
-        throw new Error(`Unsupported provider: ${providerConfig.provider}`)
+        return new OpenAIHandler(providerConfig)
     }
   }
 
