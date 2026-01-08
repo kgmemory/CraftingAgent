@@ -19,6 +19,7 @@ export class DoubaoHandler implements ApiHandler {
         this.client = new OpenAI({
           baseURL: 'https://ark.cn-beijing.volces.com/api/v3/',
           apiKey: this.doubaoConfig.apiKey,
+          dangerouslyAllowBrowser: true,
         })
       } catch (error: any) {
         throw new Error(`Error creating Doubao client: ${error.message}`)

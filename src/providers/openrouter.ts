@@ -24,9 +24,10 @@ export class OpenRouterHandler implements ApiHandler, GenerateApiHandler {
       this.client = new OpenAI({
         baseURL: this.openrouterConfig.baseUrl,
         apiKey: this.openrouterConfig.apiKey,
+        dangerouslyAllowBrowser: true,
       })
     } catch (error: any) {
-      throw new Error(`openrouter: error create client: ${error.meesage}`)
+      throw new Error(`openrouter: error create client: ${error.message}`)
     }
     return this.client
   }
