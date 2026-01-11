@@ -1,5 +1,98 @@
 import { Anthropic } from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import { ApiStream, ApiStreamChunk } from '../types/stream'
+
+export interface StreamProcessorOptions {
+  enableErrorHandling?: boolean
+  enableToolCalls?: boolean
+  enableReasoning?: boolean
+  onGenerationId?: (id: string) => void
+}
+
+export async function* processOpenAIStream(
+  stream: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>,
+  options: StreamProcessorOptions = {},
+): ApiStream {
+  const {
+    enableErrorHandling = false,
+    enableToolCalls = false,
+    enableReasoning = false,
+    onGenerationId,
+  } = options
+
+  let didOutputUsage = false
+
+  for await (const chunk of stream) {
+    const choice = chunk.choices?.[0]
+
+    if (enableErrorHandling && (choice?.finish_reason as string) === 'error') {
+      const choiceWithError = choice as any
+      if (choiceWithError.error) {
+        const error = choiceWithError.error
+        console.error(
+          `OpenAI Mid-Stream Error: ${error?.code || 'Unknown'} - ${error?.message || 'Unknown error'}`,
+        )
+        const errorDetails =
+          typeof error === 'object'
+            ? JSON.stringify(error, null, 2)
+            : String(error)
+        throw new Error(`OpenAI Mid-Stream Error: ${errorDetails}`)
+      } else {
+        throw new Error(
+          `OpenAI Mid-Stream Error: Stream terminated with error status but no error details provided`,
+        )
+      }
+    }
+
+    if (onGenerationId && chunk.id) {
+      onGenerationId(chunk.id)
+    }
+
+    const delta = chunk.choices[0]?.delta
+
+    if (delta?.content) {
+      yield {
+        type: 'text',
+        text: delta.content,
+      }
+    }
+
+    if (enableReasoning && delta && 'reasoning_content' in delta && delta.reasoning_content) {
+      yield {
+        type: 'reasoning',
+        reasoning: (delta.reasoning_content as string | undefined) || '',
+      }
+    }
+
+    if (enableToolCalls && delta?.tool_calls?.[0]) {
+      yield {
+        type: 'tool_calls',
+        tool_call: {
+          call_id: delta.tool_calls[0].id || undefined,
+          function: {
+            name: delta.tool_calls[0].function?.name || undefined,
+            arguments: delta.tool_calls[0].function?.arguments || undefined,
+          }
+        },
+      }
+    }
+
+    if (!didOutputUsage && chunk.usage) {
+      yield {
+        type: 'usage',
+        cacheWriteTokens: 0,
+        cacheReadTokens:
+          chunk.usage.prompt_tokens_details?.cached_tokens || 0,
+        inputTokens:
+          (chunk.usage.prompt_tokens || 0) -
+          (chunk.usage.prompt_tokens_details?.cached_tokens || 0),
+        outputTokens: chunk.usage.completion_tokens || 0,
+        totalCost: chunk.usage.total_tokens || 0,
+      }
+      didOutputUsage = true
+    }
+  }
+}
 
 export function convertToOpenAiMessages(
   anthropicMessages: Anthropic.Messages.MessageParam[],

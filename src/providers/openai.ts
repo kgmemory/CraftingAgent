@@ -2,7 +2,7 @@ import {ApiHandler, GenerateApiHandler, AgentImageConfig, ApiStream, ApiStreamIm
 import { ProviderConfig, AbstractTool } from '../types'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
-import {convertToOpenAiMessages} from './message_converer'
+import {convertToOpenAiMessages, processOpenAIStream} from './message_converer'
 
 export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
   private providerConfig: ProviderConfig
@@ -42,55 +42,15 @@ export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
       tools,
     )
 
-    let didOutputUsage = false
-    for await (const chunk of stream) {
-      const choice = chunk.choices?.[0]
-      if ((choice?.finish_reason as string) === 'error') {
-        const choiceWithError = choice as any
-        if (choiceWithError.error) {
-          const error = choiceWithError.error
-          console.error(
-            `OpenAI Mid-Stream Error: ${error?.code || 'Unknown'} - ${error?.message || 'Unknown error'}`,
-          )
-          const errorDetails =
-            typeof error === 'object'
-              ? JSON.stringify(error, null, 2)
-              : String(error)
-          throw new Error(`OpenAI Mid-Stream Error: ${errorDetails}`)
-        } else {
-          throw new Error(
-            `OpenAI Mid-Stream Error: Stream terminated with error status but no error details provided`,
-          )
+    yield* processOpenAIStream(stream, {
+      enableErrorHandling: true,
+      enableToolCalls: true,
+      onGenerationId: (id) => {
+        if (!this.lastGenerationId) {
+          this.lastGenerationId = id
         }
-      }
-
-      if (!this.lastGenerationId && chunk.id) {
-        this.lastGenerationId = chunk.id
-      }
-
-      const delta = chunk.choices[0]?.delta
-      if (delta?.content) {
-        yield {
-          type: 'text',
-          text: delta.content,
-        }
-      }
-
-      if (!didOutputUsage && chunk.usage) {
-        yield {
-          type: 'usage',
-          cacheWriteTokens: 0,
-          cacheReadTokens:
-            chunk.usage.prompt_tokens_details?.cached_tokens || 0,
-          inputTokens:
-            (chunk.usage.prompt_tokens || 0) -
-            (chunk.usage.prompt_tokens_details?.cached_tokens || 0),
-          outputTokens: chunk.usage.completion_tokens || 0,
-          totalCost: chunk.usage.total_tokens || 0,
-        }
-        didOutputUsage = true
-      }
-    }
+      },
+    })
   }
 
   async createOpenAIStream(

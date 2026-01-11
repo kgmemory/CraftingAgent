@@ -2,7 +2,7 @@ import { ApiHandler, ApiStream } from './index'
 import { ProviderConfig, AbstractTool } from '../types'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
-import { convertToOpenAiMessages } from './message_converer'
+import { convertToOpenAiMessages, processOpenAIStream } from './message_converer'
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
 
 export class DoubaoHandler implements ApiHandler {
@@ -50,37 +50,8 @@ export class DoubaoHandler implements ApiHandler {
       tools: (tools as OpenAITool[]) || undefined,
     })
 
-
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta
-      if (delta?.content) {
-        yield {
-          type: 'text',
-          text: delta.content,
-        }
-      }
-
-      if (delta && 'reasoning_content' in delta && delta.reasoning_content) {
-        yield {
-          type: 'reasoning',
-          reasoning: (delta.reasoning_content as string | undefined) || '',
-        }
-      }
-
-      if (delta?.tool_calls) {
-      }
-
-      if (chunk.usage) {
-        yield {
-          type: 'usage',
-          inputTokens: chunk.usage.prompt_tokens || 0,
-          outputTokens: chunk.usage.completion_tokens || 0,
-          // @ts-expect-error-next-line
-          cacheReadTokens: chunk.usage.prompt_cache_hit_tokens || 0,
-          // @ts-expect-error-next-line
-          cacheWriteTokens: chunk.usage.prompt_cache_miss_tokens || 0,
-        }
-      }
-    }
+    yield* processOpenAIStream(stream, {
+      enableReasoning: true,
+    })
   }
 }
