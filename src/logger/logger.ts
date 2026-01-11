@@ -7,7 +7,7 @@ export const logger = pino(
     level: 'info',
     base: isBrowser ? {} : { pid: process.pid, hostname: require('os').hostname() },
   },
-  isBrowser ? pino.destination({ sync: false }) : pino.transport({
+  isBrowser ? undefined : pino.transport({
     target: 'pino-pretty',
     options: {
       colorize: true,
