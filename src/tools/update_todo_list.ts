@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
 
 export const TodoTool: OpenAITool = {
     type: 'function',
@@ -17,6 +17,12 @@ export const TodoTool: OpenAITool = {
 }
 
 export class TodoToolHandler implements ToolHandler {
+    getConfig(): ToolConfig {
+        return {
+            humanInLoop: false,
+        }
+    }
+
     tool(): OpenAITool {
         return TodoTool
     }

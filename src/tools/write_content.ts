@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
 import {WebSearchTool} from "./web_search";
 
 export const WriteContentTool: OpenAITool = {
@@ -24,6 +24,12 @@ export const WriteContentTool: OpenAITool = {
 
 export default class WriteContentToolHandler implements ToolHandler {
   private context: TaskContext | null = null
+
+  getConfig(): ToolConfig {
+    return {
+      humanInLoop: false,
+    }
+  }
 
   tool(): OpenAITool {
     return WriteContentTool

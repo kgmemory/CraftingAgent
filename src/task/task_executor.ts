@@ -199,6 +199,9 @@ export class Agent {
           return toolDef.type === 'function' && toolDef.function.name === toolName
         })
         if (toolHandler) {
+          if (toolHandler.getConfig().humanInLoop) {
+            return
+          }
           lastToolCallResult = await toolHandler.execute(lastToolCall, this.taskContext)
           logger.info({
             taskId: this.taskID,

@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
 
 export const WebSearchTool: OpenAITool = {
     type: 'function',
@@ -19,6 +19,12 @@ export const WebSearchTool: OpenAITool = {
 export class WebSearchToolHandler implements ToolHandler {
     
     private context: TaskContext | null = null
+
+    getConfig(): ToolConfig {
+        return {
+            humanInLoop: false,
+        }
+    }
 
     tool(): OpenAITool {
         return WebSearchTool
