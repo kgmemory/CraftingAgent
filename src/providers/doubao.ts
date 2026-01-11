@@ -51,7 +51,9 @@ export class DoubaoHandler implements ApiHandler {
     })
 
     yield* processOpenAIStream(stream, {
-      enableReasoning: true,
+        enableErrorHandling: true,
+        enableToolCalls: true,
+        enableReasoning: true,
     })
   }
 }

@@ -7,7 +7,6 @@ import {convertToOpenAiMessages, processOpenAIStream} from './message_converer'
 export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
   private providerConfig: ProviderConfig
   private client: OpenAI | undefined
-  private lastGenerationId: string | null = null
 
   constructor(providerConfig: ProviderConfig) {
     this.providerConfig = providerConfig
@@ -45,11 +44,7 @@ export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
     yield* processOpenAIStream(stream, {
       enableErrorHandling: true,
       enableToolCalls: true,
-      onGenerationId: (id) => {
-        if (!this.lastGenerationId) {
-          this.lastGenerationId = id
-        }
-      },
+      enableReasoning: true,
     })
   }
 

@@ -6,7 +6,6 @@ export interface StreamProcessorOptions {
   enableErrorHandling?: boolean
   enableToolCalls?: boolean
   enableReasoning?: boolean
-  onGenerationId?: (id: string) => void
 }
 
 export async function* processOpenAIStream(
@@ -17,7 +16,6 @@ export async function* processOpenAIStream(
     enableErrorHandling = false,
     enableToolCalls = false,
     enableReasoning = false,
-    onGenerationId,
   } = options
 
   let didOutputUsage = false
@@ -42,10 +40,6 @@ export async function* processOpenAIStream(
           `OpenAI Mid-Stream Error: Stream terminated with error status but no error details provided`,
         )
       }
-    }
-
-    if (onGenerationId && chunk.id) {
-      onGenerationId(chunk.id)
     }
 
     const delta = chunk.choices[0]?.delta
