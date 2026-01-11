@@ -11,7 +11,7 @@ export const TodoTool: OpenAITool = {
             properties: {
                 content: { type: 'string', description: 'Full markdown checklist in execution order, using [ ] for pending, [x] for completed, and [-] for in progress' },
             },
-            required: true,
+            required: ['content'],
         },
     },
 }

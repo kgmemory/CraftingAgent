@@ -139,6 +139,7 @@ export class Agent {
       let accumulatedText = ''
       let accumulatedThinking = ''
       for await (const chunk of stream) {
+        logger.info(chunk)
         switch (chunk.type) {
           case 'text':
             accumulatedText += chunk.text
@@ -156,6 +157,8 @@ export class Agent {
             }
             yield chunk
             break
+          default:
+            yield chunk
         }
       }
 
