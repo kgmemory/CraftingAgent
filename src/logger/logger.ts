@@ -14,7 +14,7 @@ export const logger = pino({
           info: (o) => console.info(o),
           warn: (o) => console.warn(o),
           error: (o) => console.error(o),
-          fatal: (o) => console.error(o),
+          fatal: (o) => console.error(o), 
         },
       }
     : undefined,
