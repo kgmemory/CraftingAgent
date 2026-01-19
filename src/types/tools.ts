@@ -8,6 +8,7 @@ export type AbstractTool = OpenAITool | AnthropicTool | GoogleTool
 
 export interface ToolConfig {
   humanInLoop?: boolean
+  displayName?: string
 }
 
 export interface ToolHandler {
