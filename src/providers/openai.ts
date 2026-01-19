@@ -21,6 +21,25 @@ export class OpenAIHandler implements ApiHandler, GenerateApiHandler {
         baseURL: this.providerConfig.baseUrl,
         apiKey: this.providerConfig.apiKey,
         dangerouslyAllowBrowser: true,
+        fetch: async (url, init) => {
+          // 移除所有 Stainless 相关的请求头
+          if (init?.headers) {
+            const headers = new Headers(init.headers)
+            const stainlessHeaders = [
+              'x-stainless-arch',
+              'x-stainless-lang',
+              'x-stainless-os',
+              'x-stainless-package-version',
+              'x-stainless-retry-count',
+              'x-stainless-runtime',
+              'x-stainless-runtime-version',
+              'x-stainless-timeout',
+            ]
+            stainlessHeaders.forEach(header => headers.delete(header))
+            init = { ...init, headers }
+          }
+          return fetch(url, init)
+        },
       })
     } catch (error: any) {
       throw new Error(`openai: error create client: ${error.message}`)
