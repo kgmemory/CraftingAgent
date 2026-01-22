@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig, ToolContext } from '../types'
 import {WebSearchTool} from "./web_search";
 
 export const WriteContentTool: OpenAITool = {
@@ -41,7 +41,7 @@ export default class WriteContentToolHandler implements ToolHandler {
 
   async execute(
     tool: ApiStreamToolCall,
-    context?: TaskContext,
+    context?: ToolContext,
   ): Promise<string> {
     let args = tool.function.arguments
     if (typeof args === 'string') {

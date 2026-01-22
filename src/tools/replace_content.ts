@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig, ToolContext } from '../types'
 
 export const ReplaceContentTool: OpenAITool = {
   type: 'function',
@@ -62,7 +62,7 @@ export default class ReplaceContentToolHandler implements ToolHandler {
 
   async execute(
     tool: ApiStreamToolCall,
-    context?: TaskContext,
+    context?: ToolContext,
   ): Promise<string> {
     let args = tool.function.arguments
     if (typeof args === 'string') {

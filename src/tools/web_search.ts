@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig, ToolContext } from '../types'
 
 export const WebSearchTool: OpenAITool = {
     type: 'function',
@@ -34,8 +34,8 @@ export class WebSearchToolHandler implements ToolHandler {
         this.context = context
     }
 
-    async execute(tool: ApiStreamToolCall, context?: TaskContext): Promise<string> {
-        const ctx = context || this.context
+    async execute(tool: ApiStreamToolCall, context?: ToolContext): Promise<string> {
+        const ctx = context?.taskContext || this.context
         if (!ctx || !ctx.variables?.workspacePath) {
             throw new Error('Tool context (cwd) is required for file operations')
         }

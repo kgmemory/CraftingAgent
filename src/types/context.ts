@@ -10,3 +10,8 @@ export interface TaskContext {
   workspacePath?: string
 }
 
+export interface ToolContext {
+  taskContext: TaskContext
+  isPartial: boolean
+}
+

@@ -1,5 +1,5 @@
 import { ChatCompletionTool as OpenAITool } from 'openai/resources/chat/completions'
-import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig } from '../types'
+import { ToolHandler, ApiStreamToolCall, TaskContext, ToolConfig, ToolContext } from '../types'
 
 export const TodoTool: OpenAITool = {
     type: 'function',
@@ -27,7 +27,7 @@ export class TodoToolHandler implements ToolHandler {
         return TodoTool
     }
 
-    async execute(toolCall: ApiStreamToolCall, context: TaskContext): Promise<string> {
+    async execute(toolCall: ApiStreamToolCall, context: ToolContext): Promise<string> {
         return 'Todo item added'
     }
 }
