@@ -205,7 +205,7 @@ export class Agent {
           if (toolHandler.getConfig().humanInLoop) {
             return
           }
-          lastToolCallResult = await toolHandler.execute(lastToolCall, this.taskContext)
+          lastToolCallResult = await toolHandler.execute(lastToolCall, {taskContext: this.taskContext, isPartial: true})
           logger.info({
             taskId: this.taskID,
             projectId: this.projectId,
